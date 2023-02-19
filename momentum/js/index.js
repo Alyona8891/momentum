@@ -85,3 +85,37 @@ const slideNext = document.querySelector('.slide-next')
 const slidePrev = document.querySelector('.slide-prev')
 slideNext.addEventListener('click', getSlideNext)
 slidePrev.addEventListener('click', getSlidePrev)
+const weatherIcon = document.querySelector('.weather-icon');
+const temperature = document.querySelector('.temperature');
+const weatherDescription = document.querySelector('.weather-description');
+const city = document.querySelector('.city');
+async function getWeather() {  
+  const url = `https://api.openweathermap.org/data/2.5/weather?q=%D0%9C%D0%B8%D0%BD%D1%81%D0%BA&lang=en&appid=f1f0ffc7b20c762f305783914b9deb7f&units=metric`;
+  const res = await fetch(url);
+  const data = await res.json(); 
+  weatherIcon.classList.add(`owf-${data.weather[0].id}`);
+  temperature.textContent = `${data.main.temp}°C`;
+  weatherDescription.textContent = data.weather[0].description;
+  setTimeout(getWeather, 1000);
+}
+getWeather()
+city.value = 'Minsk';
+city.addEventListener('change', async function getWeatherNew() {  
+  const url = `https://api.openweathermap.org/data/2.5/weather?q=${city.value}&lang=en&appid=f1f0ffc7b20c762f305783914b9deb7f&units=metric`;
+  const res = await fetch(url);
+  const data = await res.json(); 
+  weatherIcon.className = 'weather-icon owf'
+  weatherIcon.classList.add(`owf-${data.weather[0].id}`);
+  temperature.textContent = `${data.main.temp}°C`;
+  weatherDescription.textContent = data.weather[0].description;
+});
+function setLocalStorageCity() {
+  localStorage.setItem('city', city.value);
+}
+window.addEventListener('beforeunload', setLocalStorageCity);
+function getLocalStorageCity() {
+  if(localStorage.getItem('city')) {
+    city.value = localStorage.getItem('city');
+  }
+}
+window.addEventListener('load', getLocalStorageCity);
