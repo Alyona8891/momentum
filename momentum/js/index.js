@@ -3,6 +3,7 @@ const dateOfDay = document.querySelector('.date');
 const greeting = document.querySelector('.greeting');
 const body = document.body;
 let randomNum;
+
 function showTime() {
   const date = new Date();
   const currentTime = date.toLocaleTimeString();
@@ -119,3 +120,100 @@ function getLocalStorageCity() {
   }
 }
 window.addEventListener('load', getLocalStorageCity);
+const quote = document.querySelector('.quote');
+const author = document.querySelector('.author');
+async function getQuotes() {  
+  const quotes = 'data.json';
+  const res = await fetch(quotes);
+  const data = await res.json(); 
+  let num = getRandomNum(0, 2)
+  quote.textContent = data[num].text;
+  author.textContent = data[num].author;
+}
+getQuotes();
+
+const changeQuote = document.querySelector('.change-quote');
+changeQuote.addEventListener('click', getQuotes);
+
+
+const play = document.querySelector('.play');
+let isPlay = false;
+const btnPlayNext = document.querySelector('.play-next');
+const btnPlayPrev = document.querySelector('.play-prev');
+const audio = new Audio();
+let playNum = 0;
+function playAudio() {
+  if(!isPlay) {
+    audio.src = playList[playNum].src;
+    audio.currentTime = 0;
+    audio.play();
+    isPlay = true;
+    liMusic[playNum].classList.add('item-active')
+  } else {
+    audio.pause();
+    isPlay = false;
+    liMusic[playNum].classList.remove('item-active')
+  }
+}
+function playAudioNew() {
+ 
+    audio.src = playList[playNum].src;
+    audio.currentTime = 0;
+    audio.play();
+    isPlay = true;
+    if (isPlay) {
+      play.classList.add('pause');
+    }
+ 
+
+  
+}
+function toggleBtn() {
+  play.classList.toggle('pause');
+}
+play.addEventListener('click', playAudio);
+play.addEventListener('click',toggleBtn)
+function playNext() {
+  if (playNum === playList.length-1) {
+    liMusic[playNum].classList.remove('item-active')
+    playNum = 0;
+    playAudioNew()
+    liMusic[playNum].classList.add('item-active')
+
+} else  {
+  liMusic[playNum].classList.remove('item-active')
+  playNum = playNum + 1;
+  playAudioNew()
+  liMusic[playNum].classList.add('item-active')
+}
+
+}
+audio.addEventListener('ended', playNext);
+function playPrev() {
+  if (playNum === 0) {
+    liMusic[playNum].classList.remove('item-active')
+    playNum = playList.length-1;
+    playAudioNew()
+    liMusic[playNum].classList.add('item-active')
+
+} else  {
+  liMusic[playNum].classList.remove('item-active')
+  playNum = playNum - 1;
+  playAudioNew()
+  liMusic[playNum].classList.add('item-active')
+
+}
+}
+import playList from './playList.js';
+console.log(playList);
+btnPlayNext.addEventListener('click', playNext);
+btnPlayPrev.addEventListener('click', playPrev);
+
+for(let i = 0; i < playList.length; i++) {
+  const li = document.createElement('li');
+  li.classList.add('play-item');
+  li.textContent = playList[i].title;
+  const playListContainer = document.querySelector('.play-list');
+  playListContainer.append(li)
+}
+const liMusic = document.querySelectorAll('.play-item');

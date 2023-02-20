@@ -63,10 +63,12 @@ body {
   left: 0;
   top: 2px;
   font-weight: 900;
+  transition: .3s;  
 }
 
 .item-active::before {
   color: #C5B358;
+  transition: .3s;  
 }
 
 .player-icon,
