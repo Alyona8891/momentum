@@ -58,17 +58,27 @@ body {
 }
 
 .play-item::before {
-  content: "\2713";  
+  content: "";  
+  width: 20px;
+  height: 20px;
+  background-size: 20px 20px;
+  background-image: url("../assets/svg/play.svg");
   position: absolute;
-  left: 0;
-  top: 2px;
-  font-weight: 900;
-  transition: .3s;  
-}
+  left: -10px;
+  top: 5px;
+  
+  }
 
-.item-active::before {
-  color: #C5B358;
-  transition: .3s;  
+.item-active:before {
+  background-image: url("../assets/svg/pause.svg");
+  width: 20px;
+  height: 20px;
+  background-size: 20px 20px;
+   
+  position: absolute;
+  left: -10px;
+  top: 5px;
+  
 }
 
 .player-icon,
@@ -286,3 +296,49 @@ body {
     padding: 5px;
   }
 }
+.timeline {
+  background: rebeccapurple;
+  width: 150px;
+  height: 5px;
+  cursor: pointer;
+}
+.progress {
+  width: 0px;
+  height: 5px;
+  background: rgb(13, 192, 22);
+}
+.volume-container {
+  cursor: pointer;
+  position: relative;
+ z-index: 2;
+}
+.volume-button {
+  height: 26px;
+  display: flex;
+  align-items: center;
+}
+.volume {
+  transform: scale(0.7);
+}
+.volume-slider {
+  position: absolute;
+  left: -3px; top: 15px;
+ z-index: -1;
+  width: 0px;
+  height: 15px;
+  background: white;
+  box-shadow: 0 0 20px #000a;
+  transition: .25s;
+}
+  .volume-percentage {
+    background: coral;
+    height: 100%;
+    width: 75%;
+  }
+
+  .volume-container:hover .volume-slider{
+    
+      left: -200px;
+      width: 120px;
+    
+  }

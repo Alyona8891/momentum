@@ -59,7 +59,7 @@ function setBg() {
   let timeOfDay = getTimeOfDay(); 
   let bgNum =  randomNum.toString().padStart(2, '0');
   const img = new Image();
-  img.src = `https://raw.githubusercontent.com/rolling-scopes-school/stage1-tasks/assets/images/${timeOfDay}/${bgNum}.jpg`;
+  img.src = `https://raw.githubusercontent.com/Alyona8891/stage1-tasks/assets/images/${timeOfDay}/${bgNum}.jpg`;
   img.onload = () => {      
     document.body.style.backgroundImage = `url(${img.src})`;
   }; 
@@ -142,6 +142,7 @@ const btnPlayNext = document.querySelector('.play-next');
 const btnPlayPrev = document.querySelector('.play-prev');
 const audio = new Audio();
 let playNum = 0;
+
 function playAudio() {
   if(!isPlay) {
     audio.src = playList[playNum].src;
@@ -149,10 +150,20 @@ function playAudio() {
     audio.play();
     isPlay = true;
     liMusic[playNum].classList.add('item-active')
+    let audioPlay  = setInterval (function() {
+      let audioTime = Math.round(audio.currentTime);
+      let audioLength = Math.round(audio.duration);
+      progress.style.width = (audioTime * 100) / audioLength + '%';
+      currentTimes.innerHTML = videoTime(audio.currentTime);
+      lengthTime.innerHTML = videoTime(audio.duration);
+      nameTreck.innerHTML=playList[playNum].title
+
+    })
   } else {
     audio.pause();
     isPlay = false;
     liMusic[playNum].classList.remove('item-active')
+    
   }
 }
 function playAudioNew() {
@@ -171,6 +182,7 @@ function playAudioNew() {
 function toggleBtn() {
   play.classList.toggle('pause');
 }
+let nameTreck = document.querySelector('.name-treck')
 play.addEventListener('click', playAudio);
 play.addEventListener('click',toggleBtn)
 function playNext() {
@@ -217,3 +229,71 @@ for(let i = 0; i < playList.length; i++) {
   playListContainer.append(li)
 }
 const liMusic = document.querySelectorAll('.play-item');
+
+const timeLine = document.querySelector('.timeline');
+const progress = document.querySelector('.progress');
+function videoTime(time) {
+  time = Math.floor(time);
+  let minutes = Math.floor(time/60);
+  let seconds = Math.floor(time - minutes * 60);
+  let minutesVal = minutes;
+  let secondsVal = seconds;
+  if(minutes < 10) {
+    minutesVal = '0' + minutes;
+  }
+  if(seconds < 10) {
+    secondsVal = '0' + seconds;
+  }
+  return minutesVal + ':' + secondsVal;
+}
+let currentTimes = document.querySelector('.current')
+let lengthTime = document.querySelector('.length')
+/*function videoChangeTime (e) {
+  let mouseX = Math.floor(e.pageX - progress.offsetLeft);
+  let progressX = mouseX / (progress.offseWidth / 100);
+  audio.currentTime = audio.duration * (progressX / 100)
+}*/
+
+timeLine.addEventListener("click", e => {
+  const timelineWidth = window.getComputedStyle(timeLine).width;
+  const timeToSeek = e.offsetX / parseInt(timelineWidth) * audio.duration;
+  audio.currentTime = timeToSeek;
+}, false);
+
+const volumeSlider = document.querySelector(".volume-slider");
+volumeSlider.addEventListener('click', e => {
+  const sliderWidth = window.getComputedStyle(volumeSlider).width;
+  const newVolume = e.offsetX / parseInt(sliderWidth);
+  audio.volume = newVolume;
+  document.querySelector(".volume-percentage").style.width = newVolume * 100 + '%';
+}, false)
+document.querySelector(".volume-button").addEventListener("click", () => {
+  const volumeEl = document.querySelector(".volume-container .volume");
+  audio.muted = !audio.muted;
+  if (audio.muted) {
+    volumeEl.classList.remove("icono-volumeMedium");
+    volumeEl.classList.add("icono-volumeMute");
+  } else {
+    volumeEl.classList.add("icono-volumeMedium");
+    volumeEl.classList.remove("icono-volumeMute");
+  }
+});
+let playLists = document.querySelectorAll('.play-item');
+const greetingTranslation = {
+  'ru': [
+    ['Доброй ночи,', 'Доброе утро,', 'Добрый день,', 'Добрый вечер,'],
+    ['[Введите имя]']
+  ],
+  'en': [
+    ['Good night,', 'Good morning,', 'Good afternoon,', 'Good evening,'],
+    ['[Enter name]']
+  ]
+}
+greetings.textContent = `${greetingTranslation[lang][0][index]}`;
+async function getLinkToImage() {
+  const url = 'https://api.unsplash.com/photos/random?orientation=landscape&query=nature&client_id=CXo5cbGaWVJ5fK_Jh3R3ZVj3b6-T7eksWJFoRHK8SgE';
+  const res = await fetch(url);
+  const data = await res.json();
+  return (data.urls.regular)
+ }
+ 
