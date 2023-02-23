@@ -3,22 +3,25 @@ const dateOfDay = document.querySelector('.date');
 const greeting = document.querySelector('.greeting');
 const body = document.body;
 let randomNum;
+const unsplashTag = document.querySelector('.unsplashTag');
+const flickrTag = document.querySelector('.flickrTag');
 
 function showTime() {
   const date = new Date();
   const currentTime = date.toLocaleTimeString();
   time.textContent = currentTime;
-  showDate();
+  
   setTimeout(showTime, 1000);
 }
-function showDate() {
+function showDate(lang = 'en') {
   const date = new Date();
   const options = {weekday: 'long', month: 'long', day: 'numeric'};
-  const currentDate = date.toLocaleDateString('en-US', options);
+  const currentDate = date.toLocaleDateString(`${lang}`, options);
   dateOfDay.textContent = currentDate;
-  setTimeout(showDate, 1000);
+  
 }
 showTime();
+showDate();
 function getTimeOfDay() {
   const date = new Date();
   const hours = date.getHours();
@@ -37,6 +40,7 @@ const timeOfDay = getTimeOfDay()
 greeting.textContent = `Good ${timeOfDay},`;
 const input = document.querySelector('.name');
 input.placeholder = '[Enter name]';
+
 function setLocalStorage() {
   localStorage.setItem('name', input.value);
 }
@@ -63,8 +67,10 @@ function setBg() {
   img.onload = () => {      
     document.body.style.backgroundImage = `url(${img.src})`;
   }; 
+  unsplashTag.classList.remove('unsplashTagVis');
+  flickrTag.classList.remove('flickrTagVis');
 }
-setBg();
+
 
 function getSlideNext() {
   if (+randomNum !== 20) {
@@ -90,14 +96,14 @@ const weatherIcon = document.querySelector('.weather-icon');
 const temperature = document.querySelector('.temperature');
 const weatherDescription = document.querySelector('.weather-description');
 const city = document.querySelector('.city');
-async function getWeather() {  
-  const url = `https://api.openweathermap.org/data/2.5/weather?q=%D0%9C%D0%B8%D0%BD%D1%81%D0%BA&lang=en&appid=f1f0ffc7b20c762f305783914b9deb7f&units=metric`;
+async function getWeather(lang = 'en') {  
+  const url = `https://api.openweathermap.org/data/2.5/weather?q=%D0%9C%D0%B8%D0%BD%D1%81%D0%BA&lang=${lang}&appid=f1f0ffc7b20c762f305783914b9deb7f&units=metric`;
   const res = await fetch(url);
   const data = await res.json(); 
   weatherIcon.classList.add(`owf-${data.weather[0].id}`);
   temperature.textContent = `${data.main.temp}°C`;
   weatherDescription.textContent = data.weather[0].description;
-  setTimeout(getWeather, 1000);
+  
 }
 getWeather()
 city.value = 'Minsk';
@@ -122,18 +128,34 @@ function getLocalStorageCity() {
 window.addEventListener('load', getLocalStorageCity);
 const quote = document.querySelector('.quote');
 const author = document.querySelector('.author');
-async function getQuotes() {  
-  const quotes = 'data.json';
+async function getQuotesEn() {  
+  const quotes = `dataen.json`;
   const res = await fetch(quotes);
   const data = await res.json(); 
-  let num = getRandomNum(0, 2)
+  let num = getRandomNum(0, 10)
   quote.textContent = data[num].text;
   author.textContent = data[num].author;
 }
-getQuotes();
+async function getQuotesRu() {  
+  const quotes = `dataru.json`;
+  const res = await fetch(quotes);
+  const data = await res.json(); 
+  let num = getRandomNum(0, 10)
+  quote.textContent = data[num].text;
+  author.textContent = data[num].author;
+ 
+  
+}
+
 
 const changeQuote = document.querySelector('.change-quote');
-changeQuote.addEventListener('click', getQuotes);
+changeQuote.addEventListener('click', function () {
+  if(localStorage.getItem('language') === 'ru') {
+    getQuotesRu();
+  } else {
+    getQuotesEn();
+  }
+});
 
 
 const play = document.querySelector('.play');
@@ -289,11 +311,237 @@ const greetingTranslation = {
     ['[Enter name]']
   ]
 }
-greetings.textContent = `${greetingTranslation[lang][0][index]}`;
-async function getLinkToImage() {
-  const url = 'https://api.unsplash.com/photos/random?orientation=landscape&query=nature&client_id=CXo5cbGaWVJ5fK_Jh3R3ZVj3b6-T7eksWJFoRHK8SgE';
+function showGreeting (lang = 'en') {
+  
+  function getIndex() {
+  const date = new Date();
+  const hours = date.getHours();
+  if (hours < 6) {
+    return 0;
+  } else if (hours < 12) {
+    return 1;
+  } else if (hours < 18) {
+    return 2;
+  } else {
+    return 3;
+  }}
+  
+  greeting.textContent = `${greetingTranslation[lang][0][getIndex()]}`;
+}
+
+const en = document.querySelector('#english');
+en.checked = true;
+en.addEventListener('input', my);
+function my() {
+   showGreeting('en');
+   input.placeholder = '[Enter name]';
+   showDate('en');
+   getWeather('en')
+   getQuotesEn();
+   configTitle.textContent = 'Settings';
+   languageSubtitle.textContent = 'Language';
+  localStorage.setItem('language', 'en');
+  
+  
+}
+
+const ru = document.querySelector('#russian');
+ru.addEventListener('input', my2);
+function my2() {
+  input.placeholder = '[Ведите имя]';
+  showDate('ru');
+  showGreeting('ru');
+  getWeather('ru');
+  getQuotesRu();
+  configTitle.textContent = 'Настройки'
+  languageSubtitle.textContent = 'Язык'
+  changeQuote.addEventListener('click', getQuotesRu);
+}
+const gitHab = document.querySelector('#gitt');
+const unsplash = document.querySelector('#unsplash');
+const flickr = document.querySelector('#flickr');
+
+async function getLinkToImageSpl() {
+  let url ='';
+  if(unsplashTag.value) {
+   url = `https://api.unsplash.com/photos/random?query=${unsplashTag.value}&orientation=landscape&client_id=CXo5cbGaWVJ5fK_Jh3R3ZVj3b6-T7eksWJFoRHK8SgE`;
+  } else {
+    url = `https://api.unsplash.com/photos/random?query=${getTimeOfDay()}&orientation=landscape&client_id=CXo5cbGaWVJ5fK_Jh3R3ZVj3b6-T7eksWJFoRHK8SgE`
+  }
   const res = await fetch(url);
   const data = await res.json();
-  return (data.urls.regular)
- }
+  const img = new Image();
+  img.src  = data.urls.regular;
+  img.onload = () => {      
+    document.body.style.backgroundImage = `url(${img.src})`;
+  }; 
+  flickrTag.classList.remove('flickrTagVis');
+  unsplashTag.classList.add('unsplashTagVis');
+  localStorage.setItem('unsplash', 'true')
+  localStorage.setItem('flickr', 'false')
+  localStorage.setItem('github', 'false')
+}
+
+
+async function getLinkToImageFl() {
+  let urlFl = '';
+  if(flickrTag.value) {
+  urlFl = `https://www.flickr.com/services/rest/?method=flickr.photos.search&api_key=ad685f0cac8ced2f05f740e8e8c48afd&tags=${flickrTag.value}&extras=url_l&format=json&nojsoncallback=1`;
+  } else {
+    urlFl = `https://www.flickr.com/services/rest/?method=flickr.photos.search&api_key=ad685f0cac8ced2f05f740e8e8c48afd&tags=${getTimeOfDay()}&extras=url_l&format=json&nojsoncallback=1`
+  }
+  const res = await fetch(urlFl);
+  const data = await res.json();
+  let num = getRandomNum(0, 100)
+  const img = new Image();
+  img.src  = data.photos.photo[`${num}`].url_l;
+  img.onload = () => {      
+    document.body.style.backgroundImage = `url(${img.src})`;
+  }; 
+  flickrTag.classList.add('flickrTagVis');
+  unsplashTag.classList.remove('unsplashTagVis');
+  localStorage.setItem('flickr', 'true')
+  localStorage.setItem('unsplash', 'false')
+  localStorage.setItem('github', 'false')
+}
+unsplash.addEventListener('input', getLinkToImageSpl)
+gitHab.addEventListener('input', setBg)
+flickr.addEventListener('input', getLinkToImageFl)
+
+
+const config = document.querySelector('.config');
+config.addEventListener('click', configHandler);
+const configContainer = document.querySelector('.config__container')
+function configHandler(e) {
+  configContainer.classList.toggle('visible');
+    
+}
+const configClose = document.querySelector('.config__close');
+configClose.addEventListener('click', configHandler);
+const configTitle = document.querySelector('.config__title')
+configTitle.textContent = 'Settings';
+const languageSubtitle = document.querySelector('.language__subtitle')
+languageSubtitle.textContent = 'Language'
+function getLocalLang() {
+  if(localStorage.getItem('language') === 'en') {
+    en.checked = true;
+    my();
+  } else if (localStorage.getItem('language') === 'ru') {
+    ru.checked = true;
+    my2()
+  }
+}
+function getLocalSource() {
+  if(localStorage.getItem('unsplash') === 'true') {
+    unsplash.checked = true;
+    unsplashTag.classList.add('unsplashTagVis');
+    getLinkToImageSpl()
+  } else if (localStorage.getItem('flickr')  === 'true') {
+    flickr.checked = true;
+    flickrTag.classList.add('flickrTagVis');
+    getLinkToImageFl()
+  } else {
+    gitHab.checked = true;
+    setBg();
+  }
+}
+function setLocalTeg() {
+  localStorage.setItem('TegUnspl', unsplashTag.value);
+  localStorage.setItem('TegFlickr', flickrTag.value);
+}
+window.addEventListener('beforeunload', setLocalTeg);
+function getLocalTeg() {
+  if(localStorage.getItem('TegUnspl')) {
+    unsplashTag.value = localStorage.getItem('TegUnspl');
+  } else if (localStorage.getItem('TegFlickr')) {
+    flickrTag.value = localStorage.getItem('TegFlickr');
+  } 
+  
+}
+window.addEventListener('load', getLocalTeg);
+window.addEventListener('load', getLocalLang);
+window.addEventListener('load', getLocalSource);
+const sourceSubtitle = document.querySelector('.source-image__subtitle');
+sourceSubtitle.textContent = 'Images source';
+const blocksSubtitle = document.querySelector('.blocks__subtitle');
+blocksSubtitle.textContent = 'Visible blocks';
+const weatherBlock = document.querySelector('.weather');
+const playerBlock = document.querySelector('.player');
+const dateBlock = document.querySelector('.date');
+const timeBlock = document.querySelector('.time');
+const quoteBlock = document.querySelector('.quote');
+const greetingBlock = document.querySelector('.greeting');
+const chweather = document.querySelector('#chweather');
+const chtime = document.querySelector('#chtime');
+const chdate = document.querySelector('#chdate');
+const chgreeting = document.querySelector('#chgreeting');
+const chquote = document.querySelector('#chquote');
+const chplayer = document.querySelector('#chplayer');
+
+
  
+
+
+function getLocalCh() {
+  if(localStorage.getItem('WeatherBlock') === 'false') {
+    chweather.checked = false;
+    weatherBlock.classList.toggle('unvisBlock');
+  } else {
+    chweather.checked = true;
+  }
+  if(localStorage.getItem('TimeBlock') === 'false') {
+    chtime.checked = false;
+    timeBlock.classList.toggle('unvisBlock');
+  } else {
+    chtime.checked = true;
+  }
+  if(localStorage.getItem('DateBlock') === 'false') {
+    chdate.checked = false;
+    dateBlock.classList.toggle('unvisBlock');
+  } else {
+    chdate.checked = true;
+  }
+  if(localStorage.getItem('GreetingBlock') === 'false') {
+    chgreeting.checked = false;
+    greetingBlock.classList.toggle('unvisBlock');
+  } else {
+    chgreeting.checked = true;
+  }
+  if(localStorage.getItem('QuoteBlock') === 'false') {
+    chquote.checked = false;
+    quoteBlock.classList.toggle('unvisBlock');
+  } else {
+    chquote.checked = true;
+  }
+  if(localStorage.getItem('PlayerBlock') === 'false') {
+    chplayer.checked = false;
+    playerBlock.classList.toggle('unvisBlock');
+  } else {
+    chplayer.checked = true;
+  }
+}
+window.addEventListener('load', getLocalCh);
+chweather.addEventListener('input', function () {
+  weatherBlock.classList.toggle('unvisBlock');
+  localStorage.setItem('WeatherBlock', 'false')
+})
+chtime.addEventListener('input', function () {
+  timeBlock.classList.toggle('unvisBlock');
+  localStorage.setItem('TimeBlock', 'false')
+})
+chdate.addEventListener('input', function () {
+  dateBlock.classList.toggle('unvisBlock');
+  localStorage.setItem('DateBlock', 'false')
+})
+chgreeting.addEventListener('input', function () {
+  greetingBlock.classList.toggle('unvisBlock');
+  localStorage.setItem('GreetingBlock', 'false')
+})
+chquote.addEventListener('input', function () {
+  quoteBlock.classList.toggle('unvisBlock');
+  localStorage.setItem('QuoteBlock', 'false')
+})
+chplayer.addEventListener('input', function () {
+  playerBlock.classList.toggle('unvisBlock');
+  localStorage.setItem('PlayerBlock', 'false')
+})

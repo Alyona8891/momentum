@@ -63,15 +63,85 @@
     <date class="date"></date>
     <div class="greeting-container">
       <span class="greeting"></span>
-      <input type="text" class="name" />
+      <input type="text" class="name">
     </div>
   </main>
   <footer class="footer">
+    <div class="config icono-gear"></div>
+    <div class="config__container">
+      <div class="config__close icono-crossCircle"></div>
+      <div class="config__title"></div>
+      <div class="config__item  language">
+        <div class="language__subtitle"></div>
+        <div class="language__input">
+          <input type="radio" name="language" id="english">
+          <label for="english">en</label>
+        </div>
+        <div class="language__input">
+          <input type="radio" name="language" id="russian">
+          <label for="russian">ru</label>
+        </div>
+      </div>
+      <div class="config__item  source">
+        <div class="source-image">
+          <div class="source-image__subtitle"></div>
+          <div class="source-image__block">
+            <div class="source-image__input">
+              <input type="radio" name="source" id="gitt">
+              <label for="github">Github</label>
+            </div>
+            <div class="source-image__input">
+              <input type="radio" name="source" id="unsplash">
+              <label for="unsplash">Unsplash API</label>
+            </div> 
+            <input type="text" class="unsplashTag">
+            <div class="source-image__input">
+              <input type="radio" name="source" id="flickr">
+              <label for="flickr">Flickr API</label>
+            </div>   
+            <input type="text" class="flickrTag">     
+          </div>
+        </div>
+      </div>
+      <div class="config__item  blocks">
+        <div class="blocks__subtitle"></div>
+        <div class="blocks__container">
+          <div class="blocks__input">
+            <input type="checkbox"  id="chtime" checked>
+            <label for="">Time</label>
+          </div> 
+          <div class="blocks__input">
+            <input type="checkbox"  id="chdate" checked >
+            <label for="">Date</label>
+          </div> 
+          <div class="blocks__input">
+            <input type="checkbox"  id="chgreeting" checked>
+            <label for="">Greeting</label>
+          </div> 
+          <div class="blocks__input">
+            <input type="checkbox"  id="chquote" checked>
+            <label for="">Quote</label>
+          </div> 
+          <div class="blocks__input">
+            <input type="checkbox"  id="chweather" checked>
+            <label for="">Weather</label>
+          </div> 
+          <div class="blocks__input">
+            <input type="checkbox"  id="chplayer" checked>
+            <label for="">Player</label>
+          </div> 
+        </div>
+          
+
+      </div>
+    </div>
     <button class="change-quote"></button>
     <div>
       <div class="quote"></div>
       <div class="author"></div>
     </div>
+    
+      
   </footer>
   <script type='module' src="./js/index.js"></script>
 </body>
