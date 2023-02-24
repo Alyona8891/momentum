@@ -12,6 +12,7 @@
 <body>
   <header class="header">
     <div class="player">
+      <div class="player-controls__container">
       <div class="player-controls">
         <button class="play-prev player-icon"></button>
         <button class="play player-icon"></button>
@@ -19,39 +20,42 @@
       </div>
       <ul class="play-list"></ul>
     </div>
-    <div class="player-container">
-      <div class="name-treck"></div>
-      <div class="timeline-container">
-        <div class="timeline">
-          <div class="progress"></div>
+      <div class="player-container">
+        <div class="name-treck"></div>
+        <div class="timeline-container">
+          <div class="timeline">
+            <div class="progress"></div>
+          </div>
+          <div class="time-treck">
+            <div class="current">0:00</div>
+            <div class="divider">/</div>
+            <div class="length">0:00</div>
+          </div>
         </div>
-        <div class="time-treck">
-          <div class="current">0:00</div>
-          <div class="divider">/</div>
-          <div class="length">0:00</div>
+  
+      </div>
+      <div class="volume-container">
+        <div class="volume-button">
+          <div class="volume icono-volumeMedium"></div>
+        </div>
+        <div class="volume-slider">
+          <div class="volume-percentage"></div>
         </div>
       </div>
-
     </div>
-    <div class="volume-container">
-      <div class="volume-button">
-        <div class="volume icono-volumeMedium"></div>
-      </div>
-      
-      <div class="volume-slider">
-        <div class="volume-percentage"></div>
-      </div>
-    </div>
+    
+  </div>
     <div class="weather">
       <input type="text" class="city" />
-      <i class="weather-icon owf"></i>
+      
       <div class="weather-error"></div>
       <div class="description-container">
+        <i class="weather-icon owf"></i>
         <span class="temperature"></span>
         <span class="weather-description"></span>
+        <div class="wind"></div>
+        <div class="humidity"></div>
       </div>
-      <div class="wind"></div>
-      <div class="humidity"></div>
     </div>
   </header>
   <main class="main">
@@ -64,6 +68,13 @@
     <div class="greeting-container">
       <span class="greeting"></span>
       <input type="text" class="name">
+    </div>
+    <div class="quote-container">
+    <button class="change-quote"></button>
+    <div>
+      <div class="quote"></div>
+      <div class="author"></div>
+    </div>
     </div>
   </main>
   <footer class="footer">
@@ -108,41 +119,104 @@
         <div class="blocks__container">
           <div class="blocks__input">
             <input type="checkbox"  id="chtime" checked>
-            <label for="">Time</label>
+            <label for="" id="lbtime">Time</label>
           </div> 
           <div class="blocks__input">
             <input type="checkbox"  id="chdate" checked >
-            <label for="">Date</label>
+            <label for="" id="lbdate">Date</label>
           </div> 
           <div class="blocks__input">
             <input type="checkbox"  id="chgreeting" checked>
-            <label for="">Greeting</label>
+            <label for="" id="lbgreeting">Greeting</label>
           </div> 
           <div class="blocks__input">
             <input type="checkbox"  id="chquote" checked>
-            <label for="">Quote</label>
+            <label for="" id="lbquote">Quote</label>
           </div> 
           <div class="blocks__input">
             <input type="checkbox"  id="chweather" checked>
-            <label for="">Weather</label>
+            <label for="" id="lbweather">Weather</label>
           </div> 
           <div class="blocks__input">
             <input type="checkbox"  id="chplayer" checked>
-            <label for="">Player</label>
+            <label for="" id="lbplayer">Player</label>
           </div> 
+          <div class="blocks__input">
+            <input type="checkbox"  id="chlinks" checked>
+            <label for="" id="lblinks">Links</label>
+          </div>
         </div>
           
 
       </div>
     </div>
-    <button class="change-quote"></button>
-    <div>
-      <div class="quote"></div>
-      <div class="author"></div>
+    
+    
+  </div>
+  <a href="https://github.com/Alyona8891" class="footer__gh-link" target="_blank">github</a>
+  <div class="footer__year">2023</div>
+  <a href="https://rs.school/js/" class="footer__school-link" target="_blank"><img class="rs-logo" src="./assets/svg/rs_school_js.svg"></a>
+  <div class="links">
+      
+    <button class="links__btn">Links</button>
+    <div class="links__add-block">
+      <button class="arrow icono-leftArrow"></button>
+      <input type="text" class="message" placeholder="Описание">
+      <button class="add">Создать</button>
+    </div>
+    <div class="links__block">
+      <div class="links__close icono-crossCircle"></div>
+      <a href="https://www.google.com/" target="_blank">google.com</a>
+      <div class="wrapper">
+        <ul class="todo">
+        </ul>
+      
+      </div>
+      <button class="addLink">Добавить</button>
     </div>
     
-      
   </footer>
   <script type='module' src="./js/index.js"></script>
+  <script> 
+  const addLinksBlock = document.querySelector('.links__add-block');
+  const addMessage = document.querySelector('.message');
+    const addButton = document.querySelector('.add');
+    const todo =  document.querySelector('.todo');
+    let linkList = [];
+    if(localStorage.getItem('todo')) {
+      linkList = JSON.parse(localStorage.getItem('todo'));
+      displayLinks();
+    }
+    addButton.addEventListener('click', function () {
+      let newLink = {
+        link: addMessage.value
+      }
+      linkList.push(newLink);
+      displayLinks();
+      localStorage.setItem('todo', JSON.stringify(linkList));
+      addMessage.value = '';
+      addLinksBlock.classList.remove('links__block_vis');
+    })
+    function displayLinks() {
+      let displayMessage = '';
+      if(linkList.length>0) {
+      linkList.forEach(function (item, index) {
+        displayMessage += `
+        <li class='li'>
+        <a  href='https://www.${item.link}/' target="_blank">${item.link}</a>
+        <span onclick="deleteItem()" class="close icono-trash"></span>
+        </li>`;
+        todo.innerHTML=displayMessage; 
+        });} else {  todo.innerHTML = ''}
+      
+    }
+    function deleteItem(index) {
+      linkList = JSON.parse(localStorage.getItem('todo'));
+      linkList.splice(index, 1);
+      localStorage.setItem('todo', JSON.stringify(linkList));
+      displayLinks();
+    }
+    
+    </script>
 </body>
 </html>

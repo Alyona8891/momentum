@@ -4,7 +4,9 @@ const greeting = document.querySelector('.greeting');
 const body = document.body;
 let randomNum;
 const unsplashTag = document.querySelector('.unsplashTag');
+unsplashTag.placeholder = 'enter tag'
 const flickrTag = document.querySelector('.flickrTag');
+flickrTag.placeholder = 'enter tag';
 
 function showTime() {
   const date = new Date();
@@ -43,6 +45,7 @@ input.placeholder = '[Enter name]';
 
 function setLocalStorage() {
   localStorage.setItem('name', input.value);
+  
 }
 window.addEventListener('beforeunload', setLocalStorage);
 function getLocalStorage() {
@@ -59,7 +62,6 @@ function getRandomNum(min, max) {
 }
 randomNum = getRandomNum(1, 20)
 function setBg() {
-  
   let timeOfDay = getTimeOfDay(); 
   let bgNum =  randomNum.toString().padStart(2, '0');
   const img = new Image();
@@ -67,10 +69,10 @@ function setBg() {
   img.onload = () => {      
     document.body.style.backgroundImage = `url(${img.src})`;
   }; 
+  
   unsplashTag.classList.remove('unsplashTagVis');
   flickrTag.classList.remove('flickrTagVis');
 }
-
 
 function getSlideNext() {
   if (+randomNum !== 20) {
@@ -83,8 +85,8 @@ function getSlideNext() {
 function getSlidePrev() {
   if (+randomNum !== 1) {
       randomNum = [+randomNum - 1].toString().padStart(2, '0');
-  } else  {
-      randomNum = '01';
+  } else if (+randomNum === 1){ 
+      randomNum = '20';
   }
   setBg();
 }
@@ -95,15 +97,20 @@ slidePrev.addEventListener('click', getSlidePrev)
 const weatherIcon = document.querySelector('.weather-icon');
 const temperature = document.querySelector('.temperature');
 const weatherDescription = document.querySelector('.weather-description');
+const weatherError = document.querySelector('.weather-error');
+const wind = document.querySelector('.wind');
+const humidity = document.querySelector('.humidity');
 const city = document.querySelector('.city');
-async function getWeather(lang = 'en') {  
+const descriptionContainer =  document.querySelector('.description-container');
+async function getWeather(lang = 'en', windSpeed = 'Wind speed: ', mS = 'm/s', humidityLevel = 'Humidity: ') {  
   const url = `https://api.openweathermap.org/data/2.5/weather?q=%D0%9C%D0%B8%D0%BD%D1%81%D0%BA&lang=${lang}&appid=f1f0ffc7b20c762f305783914b9deb7f&units=metric`;
   const res = await fetch(url);
   const data = await res.json(); 
   weatherIcon.classList.add(`owf-${data.weather[0].id}`);
-  temperature.textContent = `${data.main.temp}°C`;
+  temperature.textContent = `${Math.floor(data.main.temp)}°C`;
   weatherDescription.textContent = data.weather[0].description;
-  
+  wind.textContent = `${windSpeed}${Math.floor(data.wind.speed)}${mS}`;
+  humidity.textContent = `${humidityLevel}${Math.floor(data.main.humidity)}%`;
 }
 getWeather()
 city.value = 'Minsk';
@@ -111,10 +118,20 @@ city.addEventListener('change', async function getWeatherNew() {
   const url = `https://api.openweathermap.org/data/2.5/weather?q=${city.value}&lang=en&appid=f1f0ffc7b20c762f305783914b9deb7f&units=metric`;
   const res = await fetch(url);
   const data = await res.json(); 
+  if(data.cod === '404'){
+    weatherError.textContent = `Error! city not found for "${city.value}"! Try again!`;
+    descriptionContainer.classList.add('unvis');
+    weatherError.classList.remove('unvis');
+    city.value = '';
+   } else {
+    weatherError.classList.add('unvis');
+
+  descriptionContainer.classList.remove('unvis');
   weatherIcon.className = 'weather-icon owf'
   weatherIcon.classList.add(`owf-${data.weather[0].id}`);
   temperature.textContent = `${data.main.temp}°C`;
   weatherDescription.textContent = data.weather[0].description;
+   }
 });
 function setLocalStorageCity() {
   localStorage.setItem('city', city.value);
@@ -177,10 +194,13 @@ function playAudio() {
       let audioLength = Math.round(audio.duration);
       progress.style.width = (audioTime * 100) / audioLength + '%';
       currentTimes.innerHTML = videoTime(audio.currentTime);
-      lengthTime.innerHTML = videoTime(audio.duration);
-      nameTreck.innerHTML=playList[playNum].title
+      lengthTime.innerHTML = playList[playNum].duration;
+     
 
-    })
+    }
+    
+    )
+    nameTreck.innerHTML=playList[playNum].title
   } else {
     audio.pause();
     isPlay = false;
@@ -194,12 +214,10 @@ function playAudioNew() {
     audio.currentTime = 0;
     audio.play();
     isPlay = true;
+    nameTreck.innerHTML=playList[playNum].title;
     if (isPlay) {
       play.classList.add('pause');
     }
- 
-
-  
 }
 function toggleBtn() {
   play.classList.toggle('pause');
@@ -303,16 +321,13 @@ document.querySelector(".volume-button").addEventListener("click", () => {
 let playLists = document.querySelectorAll('.play-item');
 const greetingTranslation = {
   'ru': [
-    ['Доброй ночи,', 'Доброе утро,', 'Добрый день,', 'Добрый вечер,'],
-    ['[Введите имя]']
+    ['Доброй ночи,', 'Доброе утро,', 'Добрый день,', 'Добрый вечер,']
   ],
   'en': [
-    ['Good night,', 'Good morning,', 'Good afternoon,', 'Good evening,'],
-    ['[Enter name]']
+    ['Good night,', 'Good morning,', 'Good afternoon,', 'Good evening,']
   ]
 }
 function showGreeting (lang = 'en') {
-  
   function getIndex() {
   const date = new Date();
   const hours = date.getHours();
@@ -325,14 +340,12 @@ function showGreeting (lang = 'en') {
   } else {
     return 3;
   }}
-  
   greeting.textContent = `${greetingTranslation[lang][0][getIndex()]}`;
 }
-
 const en = document.querySelector('#english');
 en.checked = true;
-en.addEventListener('input', my);
-function my() {
+en.addEventListener('input', changeLangEn);
+function changeLangEn() {
    showGreeting('en');
    input.placeholder = '[Enter name]';
    showDate('en');
@@ -340,22 +353,44 @@ function my() {
    getQuotesEn();
    configTitle.textContent = 'Settings';
    languageSubtitle.textContent = 'Language';
-  localStorage.setItem('language', 'en');
-  
-  
+   sourceSubtitle.textContent = 'Images source';
+   localStorage.setItem('language', 'en');
+   unsplashTag.placeholder = 'enter tag';
+   flickrTag.placeholder = 'enter tag';
+   blocksSubtitle.textContent = 'Visible blocks';
+   lbweather.textContent = 'Weather';
+   lbtime.textContent = 'Time';
+   lbdate.textContent = 'Date';
+   lbgreeting.textContent = 'Greeting';
+   lbquote.textContent = 'Quote';
+   lbplayer.textContent = 'Player';
+   lblinks.textContent = 'Links';
 }
 
 const ru = document.querySelector('#russian');
-ru.addEventListener('input', my2);
-function my2() {
-  input.placeholder = '[Ведите имя]';
+ru.addEventListener('input', changeLangRu);
+function changeLangRu() {
+  input.placeholder = '[Введите имя]';
   showDate('ru');
   showGreeting('ru');
-  getWeather('ru');
+  getWeather('ru', 'Скорость ветра: ', ' м/сек', 'Влажность: ');
   getQuotesRu();
+  wind.textContent = 
   configTitle.textContent = 'Настройки'
   languageSubtitle.textContent = 'Язык'
   changeQuote.addEventListener('click', getQuotesRu);
+  sourceSubtitle.textContent = 'Источник изображений';
+  localStorage.setItem('language', 'ru');
+  unsplashTag.placeholder = 'введите тэг'
+  flickrTag.placeholder = 'введите тэг';
+  blocksSubtitle.textContent = 'Видимые блоки';
+  lbweather.textContent = 'Погода';
+  lbtime.textContent = 'Время';
+   lbdate.textContent = 'Дата';
+   lbgreeting.textContent = 'Приветствие';
+   lbquote.textContent = 'Цитата';
+   lbplayer.textContent = 'Аудиоплеер';
+   lblinks.textContent = 'Ссылки';
 }
 const gitHab = document.querySelector('#gitt');
 const unsplash = document.querySelector('#unsplash');
@@ -381,7 +416,21 @@ async function getLinkToImageSpl() {
   localStorage.setItem('flickr', 'false')
   localStorage.setItem('github', 'false')
 }
-
+async function getLinkToImageGh() {
+  let timeOfDay = getTimeOfDay(); 
+  let bgNum =  randomNum.toString().padStart(2, '0');
+  const img = new Image();
+  img.src = `https://raw.githubusercontent.com/Alyona8891/stage1-tasks/assets/images/${timeOfDay}/${bgNum}.jpg`;
+  img.onload = () => {      
+    document.body.style.backgroundImage = `url(${img.src})`;
+  }; 
+  unsplashTag.classList.remove('unsplashTagVis');
+  flickrTag.classList.remove('flickrTagVis');
+ 
+  localStorage.setItem('unsplash', 'false')
+  localStorage.setItem('flickr', 'false')
+  localStorage.setItem('github', 'true')
+}
 
 async function getLinkToImageFl() {
   let urlFl = '';
@@ -405,7 +454,7 @@ async function getLinkToImageFl() {
   localStorage.setItem('github', 'false')
 }
 unsplash.addEventListener('input', getLinkToImageSpl)
-gitHab.addEventListener('input', setBg)
+gitHab.addEventListener('input', getLinkToImageGh)
 flickr.addEventListener('input', getLinkToImageFl)
 
 
@@ -425,10 +474,10 @@ languageSubtitle.textContent = 'Language'
 function getLocalLang() {
   if(localStorage.getItem('language') === 'en') {
     en.checked = true;
-    my();
+    changeLangEn();
   } else if (localStorage.getItem('language') === 'ru') {
     ru.checked = true;
-    my2()
+    changeLangRu()
   }
 }
 function getLocalSource() {
@@ -440,16 +489,16 @@ function getLocalSource() {
     flickr.checked = true;
     flickrTag.classList.add('flickrTagVis');
     getLinkToImageFl()
-  } else {
+  } else if (localStorage.getItem('github')  === 'true') {
     gitHab.checked = true;
     setBg();
   }
 }
-function setLocalTeg() {
+function setLocalTag() {
   localStorage.setItem('TegUnspl', unsplashTag.value);
   localStorage.setItem('TegFlickr', flickrTag.value);
 }
-window.addEventListener('beforeunload', setLocalTeg);
+window.addEventListener('beforeunload', setLocalTag);
 function getLocalTeg() {
   if(localStorage.getItem('TegUnspl')) {
     unsplashTag.value = localStorage.getItem('TegUnspl');
@@ -466,18 +515,34 @@ sourceSubtitle.textContent = 'Images source';
 const blocksSubtitle = document.querySelector('.blocks__subtitle');
 blocksSubtitle.textContent = 'Visible blocks';
 const weatherBlock = document.querySelector('.weather');
+
 const playerBlock = document.querySelector('.player');
 const dateBlock = document.querySelector('.date');
 const timeBlock = document.querySelector('.time');
-const quoteBlock = document.querySelector('.quote');
-const greetingBlock = document.querySelector('.greeting');
+const quoteBlock = document.querySelector('.quote-container');
+const greetingBlock = document.querySelector('.greeting-container');
+const linksBlock = document.querySelector('.links');
 const chweather = document.querySelector('#chweather');
+const lbweather = document.querySelector('#lbweather');
+lbweather.textContent = 'Weather';
 const chtime = document.querySelector('#chtime');
+const lbtime = document.querySelector('#lbtime');
+lbtime.textContent = 'Time';
 const chdate = document.querySelector('#chdate');
+const lbdate = document.querySelector('#lbdate');
+lbdate.textContent = 'Date';
 const chgreeting = document.querySelector('#chgreeting');
+const lbgreeting = document.querySelector('#lbgreeting');
+lbgreeting.textContent = 'Greeting';
 const chquote = document.querySelector('#chquote');
+const lbquote = document.querySelector('#lbquote');
+lbquote.textContent = 'Quote';
 const chplayer = document.querySelector('#chplayer');
-
+const lbplayer = document.querySelector('#lbplayer');
+lbplayer.textContent = 'Player';
+const chlinks = document.querySelector('#chlinks');
+const lblinks = document.querySelector('#lblinks');
+lblinks.textContent = 'Links';
 
  
 
@@ -487,12 +552,14 @@ function getLocalCh() {
     chweather.checked = false;
     weatherBlock.classList.toggle('unvisBlock');
   } else {
+    localStorage.getItem('WeatherBlock', 'true');
     chweather.checked = true;
   }
   if(localStorage.getItem('TimeBlock') === 'false') {
     chtime.checked = false;
     timeBlock.classList.toggle('unvisBlock');
-  } else {
+  } else  {
+    localStorage.getItem('TimeBlock', 'true');
     chtime.checked = true;
   }
   if(localStorage.getItem('DateBlock') === 'false') {
@@ -519,29 +586,127 @@ function getLocalCh() {
   } else {
     chplayer.checked = true;
   }
+  if(localStorage.getItem('LinksBlock') === 'false') {
+    chlinks.checked = false;
+    linksBlock.classList.toggle('unvisBlock');
+  } else {
+    chlinks.checked = true;
+  }
 }
 window.addEventListener('load', getLocalCh);
 chweather.addEventListener('input', function () {
   weatherBlock.classList.toggle('unvisBlock');
-  localStorage.setItem('WeatherBlock', 'false')
+  if(localStorage.getItem('WeatherBlock') === 'false') {
+    localStorage.setItem('WeatherBlock', 'true');
+  } else {
+    localStorage.setItem('WeatherBlock', 'false');
+  }
 })
 chtime.addEventListener('input', function () {
   timeBlock.classList.toggle('unvisBlock');
-  localStorage.setItem('TimeBlock', 'false')
+  if(localStorage.getItem('TimeBlock') === 'false') {
+    localStorage.setItem('TimeBlock', 'true');
+  } else {
+    localStorage.setItem('TimeBlock', 'false');
+  }
+  
 })
-chdate.addEventListener('input', function () {
+chdate.addEventListener('change', function () {
   dateBlock.classList.toggle('unvisBlock');
-  localStorage.setItem('DateBlock', 'false')
+  if(localStorage.getItem('DateBlock') === 'false') {
+    localStorage.setItem('DateBlock', 'true');
+  } else {
+    localStorage.setItem('DateBlock', 'false');
+  }
+  
 })
 chgreeting.addEventListener('input', function () {
   greetingBlock.classList.toggle('unvisBlock');
-  localStorage.setItem('GreetingBlock', 'false')
+  if(localStorage.getItem('GreetingBlock') === 'false') {
+    localStorage.setItem('GreetingBlock', 'true');
+  } else {
+    localStorage.setItem('GreetingBlock', 'false');
+  }
+  
 })
 chquote.addEventListener('input', function () {
   quoteBlock.classList.toggle('unvisBlock');
-  localStorage.setItem('QuoteBlock', 'false')
+  if(localStorage.getItem('QuoteBlock') === 'false') {
+    localStorage.setItem('QuoteBlock', 'true');
+  } else {
+    localStorage.setItem('QuoteBlock', 'false');
+  }
 })
 chplayer.addEventListener('input', function () {
   playerBlock.classList.toggle('unvisBlock');
-  localStorage.setItem('PlayerBlock', 'false')
+  if(localStorage.getItem('PlayerBlock') === 'false') {
+    localStorage.setItem('PlayerBlock', 'true');
+  } else {
+    localStorage.setItem('PlayerBlock', 'false');
+  }
+  
+})
+chlinks.addEventListener('input', function () {
+  linksBlock.classList.toggle('unvisBlock');
+  if(localStorage.getItem('LinksBlock') === 'false') {
+    localStorage.setItem('LinksBlock', 'true');
+  } else {
+    localStorage.setItem('LinksBlock', 'false');
+  }
+})
+/*--------------links----*/
+/*const addMessage = document.querySelector('.message');
+const addButton = document.querySelector('.add');
+const todo =  document.querySelector('.todo');
+let linkList = [];
+if(localStorage.getItem('todo')) {
+  linkList = JSON.parse(localStorage.getItem('todo'));
+  displayLinks();
+}
+addButton.addEventListener('click', function () {
+  let newLink = {
+    link: addMessage.value
+  }
+  linkList.push(newLink);
+  displayLinks();
+  localStorage.setItem('todo', JSON.stringify(linkList));
+  addMessage.value = '';
+})
+
+function displayLinks() {
+  let displayMessage = '';
+  linkList.forEach(function (item, index) {
+    displayMessage += `
+    <li class='li'>
+    <a id='link__${index}'>${item.link}</a>
+    <span onclick="deleteItem()">x</span>
+    </li>`;
+    todo.innerHTML=displayMessage;
+    
+  });
+  
+}
+function deleteItem(index) {
+  linkList = JSON.parse(localStorage.getItem('todo'));
+  linkList.splice(index, 1);
+  localStorage.setItem('todo', JSON.stringify(linkList));
+  displayLinks();
+}*/
+const linksBtn = document.querySelector('.links__btn');
+
+linksBtn.addEventListener('click', () => {
+  linksBlock.classList.toggle('links__block_vis');
+})
+const addLinksBtn = document.querySelector('.addLink');
+const addLinksBlock = document.querySelector('.links__add-block');
+addLinksBtn.addEventListener('click', () => {
+  addLinksBlock.classList.toggle('links__block_vis');
+})
+const arrow = document.querySelector('.arrow');
+arrow.addEventListener('click', () => {
+  addLinksBlock.classList.remove('links__block_vis');
+})
+const linksClose = document.querySelector('.links__close');
+linksClose.addEventListener('click', () => {
+  linksBlock.classList.toggle('links__block_vis');
 })
