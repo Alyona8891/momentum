@@ -7,7 +7,8 @@ const unsplashTag = document.querySelector('.unsplashTag');
 unsplashTag.placeholder = 'enter tag'
 const flickrTag = document.querySelector('.flickrTag');
 flickrTag.placeholder = 'enter tag';
-
+localStorage.setItem('github', 'true');
+localStorage.setItem('language', 'en');
 function showTime() {
   const date = new Date();
   const currentTime = date.toLocaleTimeString();
@@ -74,21 +75,35 @@ function setBg() {
   flickrTag.classList.remove('flickrTagVis');
 }
 
+localStorage.setItem('github', 'true')
 function getSlideNext() {
+  if (localStorage.getItem('github') === 'true') {
   if (+randomNum !== 20) {
       randomNum = [+randomNum + 1].toString().padStart(2, '0');
   } else if (+randomNum === 20) {
       randomNum = '01';
   }
   setBg();
+} else if (localStorage.getItem('flickr') === 'true') {
+  getLinkToImageFl();
+} else if (localStorage.getItem('unsplash') === 'true') {
+  getLinkToImageSpl()
+}
 }
 function getSlidePrev() {
-  if (+randomNum !== 1) {
+  if (localStorage.getItem('github') === 'true') {
+    if (+randomNum !== 1) {
       randomNum = [+randomNum - 1].toString().padStart(2, '0');
   } else if (+randomNum === 1){ 
       randomNum = '20';
   }
   setBg();
+  } else if (localStorage.getItem('flickr') === 'true') {
+    getLinkToImageFl();
+  } else if (localStorage.getItem('unsplash') === 'true') {
+    getLinkToImageSpl()
+  }
+
 }
 const slideNext = document.querySelector('.slide-next')
 const slidePrev = document.querySelector('.slide-prev')
@@ -119,7 +134,7 @@ city.addEventListener('change', async function getWeatherNew() {
   const res = await fetch(url);
   const data = await res.json(); 
   if(data.cod === '404'){
-    weatherError.textContent = `Error! city not found for "${city.value}"! Try again!`;
+    weatherError.textContent = `Error! City not found for "${city.value}"! Try again!`;
     descriptionContainer.classList.add('unvis');
     weatherError.classList.remove('unvis');
     city.value = '';
@@ -153,6 +168,7 @@ async function getQuotesEn() {
   quote.textContent = data[num].text;
   author.textContent = data[num].author;
 }
+getQuotesEn();
 async function getQuotesRu() {  
   const quotes = `dataru.json`;
   const res = await fetch(quotes);
@@ -160,16 +176,12 @@ async function getQuotesRu() {
   let num = getRandomNum(0, 10)
   quote.textContent = data[num].text;
   author.textContent = data[num].author;
- 
-  
-}
-
-
+ }
 const changeQuote = document.querySelector('.change-quote');
 changeQuote.addEventListener('click', function () {
   if(localStorage.getItem('language') === 'ru') {
     getQuotesRu();
-  } else {
+  } else if ((localStorage.getItem('language') === 'en')) {
     getQuotesEn();
   }
 });
@@ -185,6 +197,7 @@ let playNum = 0;
 function playAudio() {
   if(!isPlay) {
     audio.src = playList[playNum].src;
+    
     audio.currentTime = 0;
     audio.play();
     isPlay = true;
@@ -195,7 +208,7 @@ function playAudio() {
       progress.style.width = (audioTime * 100) / audioLength + '%';
       currentTimes.innerHTML = videoTime(audio.currentTime);
       lengthTime.innerHTML = playList[playNum].duration;
-     
+      
 
     }
     
@@ -209,7 +222,7 @@ function playAudio() {
   }
 }
 function playAudioNew() {
- 
+ if (playNum === '') {
     audio.src = playList[playNum].src;
     audio.currentTime = 0;
     audio.play();
@@ -218,13 +231,29 @@ function playAudioNew() {
     if (isPlay) {
       play.classList.add('pause');
     }
+  } else if (playNum !== '') {
+    audio.pause();
+    liMusic[playNum].classList.remove('item-active')
+    nameTreck.innerHTML=playList[playNum].title;
+    audio.src = playList[playNum].src;
+    audio.currentTime = 0;
+    audio.play();
+    isPlay = true;
+    if (isPlay) {
+      play.classList.add('pause');
+    }
+  }
 }
 function toggleBtn() {
   play.classList.toggle('pause');
+  for(let i=0; i<4; i++) {
+    liMusic[i].classList.remove('item-active')
+  }
 }
+play.addEventListener('click',toggleBtn)
 let nameTreck = document.querySelector('.name-treck')
 play.addEventListener('click', playAudio);
-play.addEventListener('click',toggleBtn)
+
 function playNext() {
   if (playNum === playList.length-1) {
     liMusic[playNum].classList.remove('item-active')
@@ -257,15 +286,15 @@ function playPrev() {
 }
 }
 import playList from './playList.js';
-console.log(playList);
 btnPlayNext.addEventListener('click', playNext);
 btnPlayPrev.addEventListener('click', playPrev);
-
+const playListContainer = document.querySelector('.play-list');
 for(let i = 0; i < playList.length; i++) {
   const li = document.createElement('li');
-  li.classList.add('play-item');
+  li.classList.add(`play-item`);
+  li.id = `${i}`;
   li.textContent = playList[i].title;
-  const playListContainer = document.querySelector('.play-list');
+  
   playListContainer.append(li)
 }
 const liMusic = document.querySelectorAll('.play-item');
@@ -288,12 +317,6 @@ function videoTime(time) {
 }
 let currentTimes = document.querySelector('.current')
 let lengthTime = document.querySelector('.length')
-/*function videoChangeTime (e) {
-  let mouseX = Math.floor(e.pageX - progress.offsetLeft);
-  let progressX = mouseX / (progress.offseWidth / 100);
-  audio.currentTime = audio.duration * (progressX / 100)
-}*/
-
 timeLine.addEventListener("click", e => {
   const timelineWidth = window.getComputedStyle(timeLine).width;
   const timeToSeek = e.offsetX / parseInt(timelineWidth) * audio.duration;
@@ -365,6 +388,10 @@ function changeLangEn() {
    lbquote.textContent = 'Quote';
    lbplayer.textContent = 'Player';
    lblinks.textContent = 'Links';
+   linksbtn.textContent = 'Links';
+   addLinksBtn.textContent = '+ add new link';
+   addButton.textContent = 'Create';
+   linkMistake.textContent = 'Error! Enter link!'
 }
 
 const ru = document.querySelector('#russian');
@@ -378,7 +405,6 @@ function changeLangRu() {
   wind.textContent = 
   configTitle.textContent = 'Настройки'
   languageSubtitle.textContent = 'Язык'
-  changeQuote.addEventListener('click', getQuotesRu);
   sourceSubtitle.textContent = 'Источник изображений';
   localStorage.setItem('language', 'ru');
   unsplashTag.placeholder = 'введите тэг'
@@ -391,11 +417,15 @@ function changeLangRu() {
    lbquote.textContent = 'Цитата';
    lbplayer.textContent = 'Аудиоплеер';
    lblinks.textContent = 'Ссылки';
+   linksbtn.textContent = 'Ссылки';
+   addLinksBtn.textContent = '+ добавить ссылку';
+   addButton.textContent = 'Создать';
+   linkMistake.textContent = 'Ошибка! Введите ссылку!'
 }
 const gitHab = document.querySelector('#gitt');
 const unsplash = document.querySelector('#unsplash');
 const flickr = document.querySelector('#flickr');
-
+const linksbtn = document.querySelector('.links__btn');
 async function getLinkToImageSpl() {
   let url ='';
   if(unsplashTag.value) {
@@ -440,7 +470,7 @@ async function getLinkToImageFl() {
     urlFl = `https://www.flickr.com/services/rest/?method=flickr.photos.search&api_key=ad685f0cac8ced2f05f740e8e8c48afd&tags=${getTimeOfDay()}&extras=url_l&format=json&nojsoncallback=1`
   }
   const res = await fetch(urlFl);
-  const data = await res.json();
+  const data = await res.json(); 
   let num = getRandomNum(0, 100)
   const img = new Image();
   img.src  = data.photos.photo[`${num}`].url_l;
@@ -483,11 +513,10 @@ function getLocalLang() {
 function getLocalSource() {
   if(localStorage.getItem('unsplash') === 'true') {
     unsplash.checked = true;
-    unsplashTag.classList.add('unsplashTagVis');
+    
     getLinkToImageSpl()
   } else if (localStorage.getItem('flickr')  === 'true') {
     flickr.checked = true;
-    flickrTag.classList.add('flickrTagVis');
     getLinkToImageFl()
   } else if (localStorage.getItem('github')  === 'true') {
     gitHab.checked = true;
@@ -500,11 +529,10 @@ function setLocalTag() {
 }
 window.addEventListener('beforeunload', setLocalTag);
 function getLocalTeg() {
-  if(localStorage.getItem('TegUnspl')) {
+  
     unsplashTag.value = localStorage.getItem('TegUnspl');
-  } else if (localStorage.getItem('TegFlickr')) {
+  
     flickrTag.value = localStorage.getItem('TegFlickr');
-  } 
   
 }
 window.addEventListener('load', getLocalTeg);
@@ -654,48 +682,11 @@ chlinks.addEventListener('input', function () {
     localStorage.setItem('LinksBlock', 'false');
   }
 })
-/*--------------links----*/
-/*const addMessage = document.querySelector('.message');
-const addButton = document.querySelector('.add');
-const todo =  document.querySelector('.todo');
-let linkList = [];
-if(localStorage.getItem('todo')) {
-  linkList = JSON.parse(localStorage.getItem('todo'));
-  displayLinks();
-}
-addButton.addEventListener('click', function () {
-  let newLink = {
-    link: addMessage.value
-  }
-  linkList.push(newLink);
-  displayLinks();
-  localStorage.setItem('todo', JSON.stringify(linkList));
-  addMessage.value = '';
-})
 
-function displayLinks() {
-  let displayMessage = '';
-  linkList.forEach(function (item, index) {
-    displayMessage += `
-    <li class='li'>
-    <a id='link__${index}'>${item.link}</a>
-    <span onclick="deleteItem()">x</span>
-    </li>`;
-    todo.innerHTML=displayMessage;
-    
-  });
-  
-}
-function deleteItem(index) {
-  linkList = JSON.parse(localStorage.getItem('todo'));
-  linkList.splice(index, 1);
-  localStorage.setItem('todo', JSON.stringify(linkList));
-  displayLinks();
-}*/
 const linksBtn = document.querySelector('.links__btn');
-
+const linksBlockCont = document.querySelector('.links__block');
 linksBtn.addEventListener('click', () => {
-  linksBlock.classList.toggle('links__block_vis');
+    linksBlockCont.classList.toggle('links__block_vis');
 })
 const addLinksBtn = document.querySelector('.addLink');
 const addLinksBlock = document.querySelector('.links__add-block');
@@ -705,8 +696,72 @@ addLinksBtn.addEventListener('click', () => {
 const arrow = document.querySelector('.arrow');
 arrow.addEventListener('click', () => {
   addLinksBlock.classList.remove('links__block_vis');
+  linkMistake.classList.remove('link__mistake_vis');
 })
 const linksClose = document.querySelector('.links__close');
 linksClose.addEventListener('click', () => {
-  linksBlock.classList.toggle('links__block_vis');
+  linksBlockCont.classList.toggle('links__block_vis');
 })
+const addButton = document.querySelector('.add');
+const linkMistake = document.querySelector('.link__mistake');
+let currentNumTrack = '';
+
+playListContainer.addEventListener('click', function(event) {
+  let targetClassList = event.target.classList;
+  let targetId = +event.target.id;
+  lengthTime.innerHTML = playList[targetId].duration;
+  if (currentNumTrack === '' || currentNumTrack !== targetId) {
+   if (targetClassList.contains('play-item')) {
+    if(!isPlay) {         
+      
+      audio.src = playList[targetId].src;
+      audio.currentTime = 0;
+      audio.play();
+      isPlay = true;
+      liMusic[targetId].classList.add('item-active')
+      
+      play.classList.toggle('pause');
+      let audioPlay  = setInterval (function() {
+      let audioTime = Math.round(audio.currentTime);
+      let audioLength = Math.round(audio.duration);
+      progress.style.width = (audioTime * 100) / audioLength + '%';
+      currentTimes.innerHTML = videoTime(audio.currentTime);
+      
+    }
+      
+      )
+      playNum=targetId;
+      nameTreck.innerHTML=playList[targetId].title;
+      currentNumTrack = targetId;
+    } else {    
+      for(let i=0; i<4; i++) {
+        liMusic[i].classList.remove('item-active')
+      }
+      
+      audio.src = playList[targetId].src;
+      audio.currentTime = 0;
+      audio.play();
+      liMusic[targetId].classList.add('item-active')
+      play.classList.add('pause');
+      
+      let audioPlay  = setInterval (function() {
+      let audioTime = Math.round(audio.currentTime);
+      let audioLength = Math.round(audio.duration);
+      progress.style.width = (audioTime * 100) / audioLength + '%';
+      currentTimes.innerHTML = videoTime(audio.currentTime);
+      
+    })
+    playNum=targetId;
+    nameTreck.innerHTML=playList[targetId].title
+    currentNumTrack = targetId;
+  }
+
+}} else if (currentNumTrack === targetId) {
+  audio.pause();
+    isPlay = false;
+    liMusic[playNum].classList.remove('item-active');
+    play.classList.remove('pause');
+    for(let i=0; i<4; i++) {
+      liMusic[i].classList.remove('item-active')
+    }
+}}) 

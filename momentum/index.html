@@ -81,7 +81,12 @@
   <footer class="footer">
     <div class="config icono-gear"></div>
     <div class="config__container">
-      <div class="config__close icono-crossCircle"></div>
+      <div class="config__close-container">
+        <div class="config__close icono-crossCircle">
+
+        </div>
+      </div>
+      
       <div class="config__title"></div>
       <div class="config__item  language">
         <div class="language__subtitle"></div>
@@ -161,9 +166,10 @@
       
     <button class="links__btn">Links</button>
     <div class="links__add-block">
-      <button class="arrow icono-leftArrow"></button>
-      <input type="text" class="message" placeholder="Описание">
-      <button class="add">Создать</button>
+      <button class="arrow"><img src="./assets/svg/slider-prev.svg" alt=""></button>
+      <input type="text" class="message" placeholder="example.com">
+      <div class="link__mistake"></div>
+      <button class="add">Create link</button>
     </div>
     <div class="links__block">
       <div class="links__close icono-crossCircle"></div>
@@ -171,9 +177,8 @@
       <div class="wrapper">
         <ul class="todo">
         </ul>
-      
       </div>
-      <button class="addLink">Добавить</button>
+      <button class="addLink"> + add new link</button>
     </div>
     
   </footer>
@@ -181,6 +186,7 @@
   <script> 
   const addLinksBlock = document.querySelector('.links__add-block');
   const addMessage = document.querySelector('.message');
+  const linkMistake = document.querySelector('.link__mistake');
     const addButton = document.querySelector('.add');
     const todo =  document.querySelector('.todo');
     let linkList = [];
@@ -189,6 +195,7 @@
       displayLinks();
     }
     addButton.addEventListener('click', function () {
+      if (addMessage.value) {
       let newLink = {
         link: addMessage.value
       }
@@ -197,7 +204,12 @@
       localStorage.setItem('todo', JSON.stringify(linkList));
       addMessage.value = '';
       addLinksBlock.classList.remove('links__block_vis');
-    })
+      linkMistake.classList.remove('link__mistake_vis')
+    } else {
+      linkMistake.classList.add('link__mistake_vis')
+      
+
+    }})
     function displayLinks() {
       let displayMessage = '';
       if(linkList.length>0) {
