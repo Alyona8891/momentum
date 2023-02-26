@@ -129,7 +129,7 @@ async function getWeather(lang = 'en', windSpeed = 'Wind speed: ', mS = 'm/s', h
 }
 getWeather()
 city.value = 'Minsk';
-city.addEventListener('change', async function getWeatherNew() {  
+city.addEventListener('change', async function getWeatherNew(lang = 'en', windSpeed = 'Wind speed: ', mS = 'm/s', humidityLevel = 'Humidity: ') {  
   const url = `https://api.openweathermap.org/data/2.5/weather?q=${city.value}&lang=en&appid=f1f0ffc7b20c762f305783914b9deb7f&units=metric`;
   const res = await fetch(url);
   const data = await res.json(); 
@@ -142,10 +142,11 @@ city.addEventListener('change', async function getWeatherNew() {
     weatherError.classList.add('unvis');
 
   descriptionContainer.classList.remove('unvis');
-  weatherIcon.className = 'weather-icon owf'
   weatherIcon.classList.add(`owf-${data.weather[0].id}`);
-  temperature.textContent = `${data.main.temp}°C`;
+  temperature.textContent = `${Math.floor(data.main.temp)}°C`;
   weatherDescription.textContent = data.weather[0].description;
+  wind.textContent = `${windSpeed}${Math.floor(data.wind.speed)}${mS}`;
+  humidity.textContent = `${humidityLevel}${Math.floor(data.main.humidity)}%`;
    }
 });
 function setLocalStorageCity() {

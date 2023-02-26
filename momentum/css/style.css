@@ -10,8 +10,8 @@
 }
 
 body {
-  min-width: 480px;
-  min-height: 100vh;
+ /* min-width: 480px;*/
+  height: 100vh;
   font-family: 'Arial', sans-serif;
   font-size: 16px;
   color: #fff;
@@ -37,7 +37,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  width: 120px;
+  min-width: 120px;
   margin-bottom: 28px;
 }
 
@@ -145,8 +145,8 @@ body {
   
   align-items: flex-start;
   row-gap: 5px;
-  width: 180px;
-  min-height: 180px;  
+  max-width: 180px;
+  /*min-height: 180px;  */
   text-align: left;
 }
 .description-container > *:not(:last-child) {
@@ -167,7 +167,7 @@ body {
 }
 
 .city {
-  width: 170px;
+  max-width: 170px;
   height: 34px;
   padding: 5px;
   font-size: 20px;
@@ -333,7 +333,7 @@ body {
   position: absolute;
   right: -3px; 
   top: 23px;
-  z-index: -1;
+  z-index: 5;
   width: 0px;
   height: 10px;
   background: white;
@@ -357,28 +357,6 @@ body {
   .lang {
     display: flex;
   }
-  .gitHab {
-    height: 20px;
-    width: 70px;
-    background-color: rgb(45, 150, 136);
-    cursor: pointer;
-  }
-  .unsplash {
-    font-size: 10px;
-    height: 20px;
-    width: 70px;
-    background-color: rgb(248, 15, 15);
-    cursor: pointer;
-  }
-  .flickr {
-    font-size: 10px;
-    height: 20px;
-    width: 70px;
-    background-color: rgb(191, 230, 63);
-    cursor: pointer;
-    
-  }
-
   .unsplashTag {
       max-width: 120px;
     font-size: 10px;
@@ -420,7 +398,7 @@ body {
   position: fixed;
   top: calc((100vh - 120px) / 2);
   left: -800px;
-  width: 350px;
+  max-width: 350px;
  
   background-color: rgba(154, 37, 37, 0.80);
   border-radius: 30px;
@@ -510,7 +488,7 @@ margin-bottom: 5px;
   transition: 0.3s;
 }
 .links__block {
-width: 220px;
+min-width: 220px;
 min-height: 220px;
 position: fixed;
 top: calc((100vh - 120px) / 2);
@@ -523,13 +501,14 @@ border-radius: 30px;
     display: flex;
     flex-direction: column;
     align-items: left;
+    box-sizing: border-box;
 }
 .links__block > a {
   margin-bottom: 5px;
 }
 
 .links__add-block {
-  width: 220px;
+ min-width: 220px;
   min-height: 220px;
   position: fixed;
   top: calc((100vh - 120px) / 2);
@@ -542,6 +521,7 @@ border-radius: 30px;
     display: flex;
     flex-direction: column;
     align-items: left;
+    box-sizing: border-box;
     
 }
 .links__block_vis {
@@ -602,7 +582,7 @@ width: 60px;
 }
 .name-treck {
   height: 20px;
-  width: 150px;
+  max-width: 150px;
   color:rgba(154, 37, 37) ;
 }
 .timeline-container {
